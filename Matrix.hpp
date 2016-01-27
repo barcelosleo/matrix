@@ -1,28 +1,79 @@
 #include <iostream>
 #include <vector>
 
-template <typename T>
+typedef std::vector< std::vector<double> > matrix_double;
+
 class Matrix {
 private:
-    std::vector< std::vector<T> > matrix;
+    matrix_double matrix;
+    matrix_double cache;
 public:
-    Matrix(int i, int j) {
-        this->matrix.assign(i, std::vector<T>(j, 0));
-    }
-    void fillWith(T x) {
-        for(int i = 0; i < this->matrix.size(); i++) {
-            for (int j = 0; j < this->matrix[i].size(); j++) {
-                this->matrix[i][j] = x;
-            }
-        }
-    }
-    void printMatrix() {
-        for(int i = 0; i < this->matrix.size(); i++) {
-            std::cout << "|\t";
-            for (int j = 0; j < this->matrix[i].size(); j++) {
-                std::cout << this->matrix[i][j] << "\t";
-            }
-            std::cout << "|" << std::endl;
-        }
-    }
+    /**
+     * Construtor vazio
+     */
+    Matrix();
+    /**
+     * Construtor de matriz quadrada
+     */
+    Matrix(int d);
+    /**
+     * Inicializa uma matriz I x J
+     */
+    Matrix(int i, int j);
+    /**
+     * Destrutor da classe
+     */
+    ~Matrix();
+    /**
+     * Prenche a matrix com o valor de x
+     */
+    void fillWith(double x);
+    /**
+     * Gera uma matriz randômica de I x J dimensões. Por padrão o limite de Linhas(I) e Colunas(J) é 10
+     */
+    void autoFill(int limitI = 10, int limitJ = 10);
+    /**
+     * Mostra a matriz na tela
+     */
+    void printMatrix();
+    /**
+     * Retorna a matriz transposta
+     */
+    Matrix transpose();
+    /**
+     * Retorna a matriz identidade
+     */
+    Matrix identity();
+    /**
+     * Retorna a soma da matriz com outra matriz
+     */
+    Matrix sum(Matrix matrix);
+    /**
+     * Retorna a subtração da matriz com outra
+     */
+    Matrix subtract(Matrix matrix);
+    /**
+     * Retorna a multiplicação da matriz com outra
+     */
+    Matrix multiply(Matrix matrix);
+    /**
+     * Retorna a multiplicação da matriz por um número
+     */
+    Matrix multiply(double number);
+    /**
+     * Retorna a determinante da matriz
+     */
+    double determinant();
+    /**
+     * Retorna a determinante de uma submatriz
+     */
+    double determinant(Matrix subMatrix);
+    /**
+     * Retorna a matriz de cofatores da matriz
+     */
+    Matrix cofactorMatrix();
+    /**
+     * Retorna a matriz adjunta
+     */
+    Matrix adjointMatrix();
 };
