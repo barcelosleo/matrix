@@ -81,7 +81,7 @@ public:
      */
     void randomMatrix(int limitI = 10, int limitJ = 10);
     /**
-     * Preenche a matriz com valores randômicos
+     * Preenche a matriz com valores randômicos de -limit até limit
      */
     void autoFill(int limit = 100);
     /**
@@ -119,7 +119,7 @@ public:
     /**
      * Retorna a determinante de uma matriz
      */
-    double determinant(Matrix* matrix);
+    long double determinant(Matrix* matrix);
     /**
      * Eleminação de Gauss. Baseado no algoritmo desenvolvido por Jordi Cortadella da Universitat Politècnica de Catalunya
      */

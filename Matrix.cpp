@@ -104,7 +104,7 @@ void Matrix::autoFill(int limit) {
     srand(time(NULL));
     for (int i = 0; i < this->getI(); i++) {
         for (int j = 0; j < this->getJ(); j++) {
-            this->matrix[i][j] = rand() % limit + 1;
+            this->matrix[i][j] = rand() % limit + (-limit);
         }
     }
 }
@@ -295,8 +295,8 @@ double Matrix::determinant() {
 /**
  * {inherited}
  */
-double Matrix::determinant(Matrix *matrix) {
-    double det = 1;
+long double Matrix::determinant(Matrix *matrix) {
+    long double det = 1;
     for (int i = 0; i < matrix->getI(); i++) {
         for (int j = 0; j < matrix->getJ(); j++) {
             j != i ?: det *= matrix->getAt(i, j);
