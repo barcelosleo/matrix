@@ -12,6 +12,8 @@ typedef struct Type_ {
     int j;
 }MatrixType;
 
+#define RANDOMIC true
+
 class Matrix {
 private:
     MatrixType type;
@@ -91,6 +93,10 @@ public:
      */
     void swap(double* p1, double* p2);
     /**
+     * Faz um swap com duas linhas de uma determinada matriz
+     */
+    void swapRows(int i1, int i2);
+    /**
      * Retorna a matriz transposta
      */
     Matrix* transpose();
@@ -103,13 +109,25 @@ public:
      */
     Matrix* identity();
     /**
+     * Retorna uma matriz sem a linha I e a coluna J
+     */
+    Matrix* getSubMatrix(int I, int J);
+    /**
      * Retorna a determinante da matriz
      */
     double determinant();
     /**
-     * Retorna a determinante de uma submatriz
+     * Retorna a determinante de uma matriz
      */
-    double determinant(Matrix* subMatrix);
+    double determinant(Matrix* matrix);
+    /**
+     * Eleminação de Gauss. Baseado no algoritmo desenvolvido por Jordi Cortadella da Universitat Politècnica de Catalunya
+     */
+    bool gaussElimination(Matrix* matrix);
+    /**
+     * Retorna a matriz com uma triangulação superior
+     */
+    Matrix* topTriangulationWithGaussianElimination();
     /**
      * Retorna a matriz de cofatores da matriz
      */
@@ -127,6 +145,10 @@ public:
      */
     bool multipliable(Matrix* m1, Matrix* m2);
     /**
+     * Verifica se é uma matriz quadrada
+     */
+    bool isSquare();
+    /**
      * Insere dado na posição [i][j]
      */
     void insertAt(int i, int j, double value);
@@ -134,6 +156,18 @@ public:
      * Soma dado na posição [i][j]
      */
     void sumAt(int i, int j, double value);
+    /**
+     * Subtrai dado na posição [i][j]
+     */
+    void subtractAt(int i, int j, double value);
+    /**
+     * Encontra o índice da linha com maior valor absoluto. Baseado no algoritmo desenvolvido por Jordi Cortadella da Universitat Politècnica de Catalunya
+     */
+    int findMax(Matrix* matrix, int index);
+    /**
+     * Copia uma matriz
+     */
+    Matrix* copy();
     /**
      * Pega dado nas posições [i][j]
      */

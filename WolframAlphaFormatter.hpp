@@ -1,12 +1,12 @@
-#ifndef SYMBOLABFORMATTER_HPP
-#define SYMBOLABFORMATTER_HPP
+#ifndef WOLFRAM_ALPHA_FORMATTER_HPP
+#define WOLFRAM_ALPHA_FORMATTER_HPP
 
 #include <iostream>
 #include "Formatter.hpp"
 
-class SymbolabFormatter: public Formatter{
+class WolframAlphaFormatter: public Formatter{
 public:
-    SymbolabFormatter();
+    WolframAlphaFormatter();
     /**
      * Retorna uma string que pode ser usada no symbolab para testes
      */

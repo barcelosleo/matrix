@@ -35,3 +35,7 @@ std::string SymbolabFormatter::matrixSumString(Matrix *m1, Matrix *m2) {
 std::string SymbolabFormatter::matrixProductString(Matrix *m1, Matrix *m2) {
     return SymbolabFormatter::matrixString(m1) + "\\cdot " + SymbolabFormatter::matrixString(m2);
 }
+
+std::string SymbolabFormatter::matrixDeterminantString(Matrix* matrix) {
+    return "det" + SymbolabFormatter::matrixString(matrix);
+}

@@ -1,12 +1,12 @@
-#ifndef SYMBOLABFORMATTER_HPP
-#define SYMBOLABFORMATTER_HPP
+#ifndef FORMATTER_HPP
+#define FORMATTER_HPP
 
 #include <iostream>
-#include "Formatter.hpp"
+#include <string>
+#include "Matrix.hpp"
 
-class SymbolabFormatter: public Formatter{
+class Formatter {
 public:
-    SymbolabFormatter();
     /**
      * Retorna uma string que pode ser usada no symbolab para testes
      */
