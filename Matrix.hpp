@@ -19,6 +19,7 @@ private:
     MatrixType type;
     matrix_double matrix;
     double initializer;
+    int gaussEliminationSwaps;
     /**
      * Retorna a soma da matriz com outra matriz
      */
@@ -40,6 +41,10 @@ public:
      * Construtor vazio
      */
     Matrix();
+    /**
+     * Construtor que recebe uma matrix_double
+     */
+    Matrix(matrix_double matrix);
     /**
      * Construtor que gera uma matriz randômica
      */
@@ -119,11 +124,19 @@ public:
     /**
      * Retorna a determinante de uma matriz
      */
-    long double determinant(Matrix* matrix);
+    double determinant(Matrix* matrix);
+    /**
+     * Retorna a determinante de uma matriz. Usado método recursivo, logo, mais lento.
+     */
+    double recursiveDeterminant(Matrix *matrix);
+    /**
+     * Retorna o produto da diagonal principal
+     */
+    double mainDiagonaProduct(Matrix* matrix);
     /**
      * Eleminação de Gauss. Baseado no algoritmo desenvolvido por Jordi Cortadella da Universitat Politècnica de Catalunya
      */
-    bool gaussElimination(Matrix* matrix);
+    int gaussElimination(Matrix* matrix);
     /**
      * Retorna a matriz com uma triangulação superior
      */
@@ -136,6 +149,10 @@ public:
      * Retorna a matriz adjunta
      */
     Matrix* adjointMatrix();
+    /**
+     * Retorna a matriz inversa
+     */
+    Matrix* inverse();
     /**
      * Verifica se duas matrizes são do mesmo tipo
      */
@@ -183,11 +200,11 @@ public:
     /**
     * Modificador de operador + para soma de matrizes
     */
-   Matrix* operator+ (Matrix* matrix);
+   Matrix* operator+ (Matrix matrix);
     /**
      * Modificador de operador * para multiplicação de matrizes
      */
-    Matrix* operator* (Matrix* matrix);
+    Matrix* operator* (Matrix matrix);
     /**
      * Modificador de operador * para multiplicação por número
      */
@@ -195,7 +212,11 @@ public:
     /**
      * Modificador de operador - para subtração de matrizes
      */
-    Matrix* operator- (Matrix* matrix);
+    Matrix* operator- (Matrix matrix);
+    /**
+     * Modificador de operador << para inicialiação de matriz
+     */
+    void operator<< (matrix_double matrix);
 };
 
 #endif

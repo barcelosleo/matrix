@@ -29,7 +29,11 @@ std::string WolframAlphaFormatter::transposedMatrixString(Matrix *matrix) {
 }
 
 std::string WolframAlphaFormatter::matrixSumString(Matrix *m1, Matrix *m2) {
-    return WolframAlphaFormatter::matrixString(m1) + "+:" + WolframAlphaFormatter::matrixString(m2);
+    return WolframAlphaFormatter::matrixString(m1) + "+" + WolframAlphaFormatter::matrixString(m2);
+}
+
+std::string WolframAlphaFormatter::matrixSubtractionString(Matrix* m1, Matrix* m2) {
+    return WolframAlphaFormatter::matrixString(m1) + "-" + WolframAlphaFormatter::matrixString(m2);
 }
 
 std::string WolframAlphaFormatter::matrixProductString(Matrix *m1, Matrix *m2) {

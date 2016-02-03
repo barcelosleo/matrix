@@ -1,15 +1,28 @@
 #include <sstream>
+#include <exception>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
 #include <stdio.h>
 #include "Matrix.hpp"
+#include "Exceptions/MatrixException.hpp"
 
 /**
  * {inherited}
  */
 Matrix::Matrix() {
     this->initializer = 0;
+    this->gaussEliminationSwaps = 0;
+}
+
+/**
+ * {inherited}
+ */
+Matrix::Matrix(matrix_double matrix) {
+    this->initializer = 0;
+    this->gaussEliminationSwaps = 0;
+    this->matrix = matrix;
+    this->setMatrixType(matrix.size(), matrix[0].size());
 }
 
 /**
@@ -17,6 +30,7 @@ Matrix::Matrix() {
  */
 Matrix::Matrix(bool random) {
     this->initializer = 0;
+    this->gaussEliminationSwaps = 0;
     this->randomMatrix();
 }
 
@@ -25,6 +39,7 @@ Matrix::Matrix(bool random) {
  */
 Matrix::Matrix(int d) {
     this->initializer = 0;
+    this->gaussEliminationSwaps = 0;
     this->createMatrix(d, d);
     this->setMatrixType(d, d);
 }
@@ -34,6 +49,7 @@ Matrix::Matrix(int d) {
  */
 Matrix::Matrix(int i, int j) {
     this->initializer = 0;
+    this->gaussEliminationSwaps = 0;
     this->createMatrix(i, j);
     this->setMatrixType(i, j);
 }
@@ -101,10 +117,12 @@ void Matrix::randomMatrix(int limitI, int limitJ) {
  * {inherited}
  */
 void Matrix::autoFill(int limit) {
+    int min = -limit;
+    int max = limit;
     srand(time(NULL));
     for (int i = 0; i < this->getI(); i++) {
         for (int j = 0; j < this->getJ(); j++) {
-            this->matrix[i][j] = rand() % limit + (-limit);
+            this->matrix[i][j] = round((float(rand()) / float(RAND_MAX)) * (max - min) + min);
         }
     }
 }
@@ -160,13 +178,8 @@ Matrix* Matrix::transpose() {
  * {inherited}
  */
 Matrix* Matrix::opposite() {
-    Matrix* opposite = new Matrix(this->getI(), this->getJ());
-    for (int i = 0; i < this->getI(); i++) {
-        for (int j = 0; j < this->getJ(); j++) {
-            opposite->insertAt(i, j, this->matrix[i][j] * -1);
-        }
-    }
-    return opposite;
+    Matrix* opposite = this->copy();
+    return ((*opposite) * -1.0);
 }
 
 /**
@@ -198,9 +211,9 @@ Matrix* Matrix::sum(Matrix* matrix) {
             }
             return sum;
         }
-        throw "Matriz não somavel!";// Aprender exceptions em C++
-    } catch (char const* e) {
-        std::cout << e << std::endl;
+        throw MatrixException("Matriz não somável");// Aprender exceptions em C++
+    } catch (MatrixException e) {
+        std::cout << e.what() << std::endl;
     }
 }
 
@@ -221,9 +234,9 @@ Matrix* Matrix::multiply(Matrix *matrix) {
             }
             return product;
         }
-        throw "Matriz não multiplicável!";
-    } catch (char const* e) {
-        std::cout << e << std::endl;
+        throw MatrixException("Matriz não multiplicável");
+    } catch (MatrixException e) {
+        std::cout << e.what() << std::endl;
     }
 }
 
@@ -234,6 +247,7 @@ Matrix* Matrix::multiply(double number) {
     Matrix* product = new Matrix(this->getI(), this->getJ());
     for (int i = 0; i < this->getI(); i++) {
         for (int j = 0; j < this->getJ(); j++) {
+            // std::cout << this->matrix[i][j] << " * " << number << std::endl;
             product->insertAt(i, j, this->matrix[i][j] * number);
         }
     }
@@ -254,9 +268,9 @@ Matrix* Matrix::subtract(Matrix *matrix) {
             }
             return sum;
         }
-        throw "Matriz não subtrativa!";// Aprender exceptions em C++
-    } catch (char const* e) {
-        std::cout << e << std::endl;
+        throw MatrixException("Matriz não subtrativa");// Aprender exceptions em C++
+    } catch (MatrixException e) {
+        std::cout << e.what() << std::endl;
     }
 }
 
@@ -283,72 +297,115 @@ Matrix* Matrix::getSubMatrix(int I, int J) {
 double Matrix::determinant() {
     try {
         if (this->isSquare()) {
-
-            return this->determinant(this->topTriangulationWithGaussianElimination());
+            return this->determinant(this->topTriangulationWithGaussianElimination()) *  pow(-1, this->gaussEliminationSwaps);
         }
-        throw "Matriz não é quadrada!";
-    } catch (char const* e) {
-        std::cout << e << std::endl;
+        throw MatrixException("Matriz não é quadrada");
+    } catch (MatrixException e) {
+        std::cout << e.what() << std::endl;
     }
 }
 
 /**
  * {inherited}
  */
-long double Matrix::determinant(Matrix *matrix) {
-    long double det = 1;
+double Matrix::determinant(Matrix *matrix) {
+    return this->mainDiagonaProduct(matrix);
+}
+
+/**
+* {inherited}
+*/
+double Matrix::recursiveDeterminant(Matrix *matrix) {
+    // matrix->printMatrix();
+    if (matrix->getI() < 1) {
+        throw "Dimensão da matriz é menor que 1!";
+    } else if(matrix->getI() == 1) {
+        return matrix->matrix[0][0];
+    } else if(matrix->getI() == 2) {
+        return (
+            (matrix->matrix[0][0] * matrix->matrix[1][1]) - (matrix->matrix[0][1] * matrix->matrix[1][0])
+        );
+    } else {
+        double det = 0;
+        for (int i = 0; i < matrix->getI(); i++) {
+            Matrix* subMatrix = matrix->getSubMatrix(0, i);
+            det += pow(-1, i) * matrix->matrix[0][i] * this->determinant(subMatrix);
+        }
+        return det;
+    }
+}
+
+/**
+* {inherited}
+*/
+double Matrix::mainDiagonaProduct(Matrix *matrix) {
+    double product = 1;
     for (int i = 0; i < matrix->getI(); i++) {
         for (int j = 0; j < matrix->getJ(); j++) {
-            j != i ?: det *= matrix->getAt(i, j);
+            j != i ?: product *= matrix->getAt(i, j);
         }
     }
-    return det;
+    return product;
 }
-// double Matrix::determinant(Matrix *matrix) {
-//     // matrix->printMatrix();
-//     if (matrix->getI() < 1) {
-//         throw "Dimensão da matriz é menor que 1!";
-//     } else if(matrix->getI() == 1) {
-//         return matrix->matrix[0][0];
-//     } else if(matrix->getI() == 2) {
-//         return (
-//             (matrix->matrix[0][0] * matrix->matrix[1][1]) - (matrix->matrix[0][1] * matrix->matrix[1][0])
-//         );
-//     } else {
-//         double det = 0;
-//         for (int i = 0; i < matrix->getI(); i++) {
-//             Matrix* subMatrix = matrix->getSubMatrix(0, i);
-//             det += pow(-1, i) * matrix->matrix[0][i] * this->determinant(subMatrix);
-//         }
-//         return det;
-//     }
-// }
 
-bool Matrix::gaussElimination(Matrix* matrix) {
+int Matrix::gaussElimination(Matrix* matrix) {
     int n = matrix->getI();
+    this->gaussEliminationSwaps = 0;
+
     for (int k = 0; k < n; ++k) {
         int imax = this->findMax(matrix, k);
-        if (matrix->getAt(imax, k) == 0) return true;
+        if (matrix->getAt(imax, k) == 0) return 0;
         matrix->swapRows(k, imax);
+        // Verifica se foi feito o swap entre duas linhas diferentes.
+        // Ao calcular a determinante o número de swaps será o expoente de -1, assim ditando se o
+        // resultado da determinante será multiplicado por 1 ou -1
+        if (k != imax) {
+            // std::cout << "Fez swap de L" << k << " com L" << imax << std::endl;
+            // std::cout << "Swaps = " << this->gaussEliminationSwaps << std::endl;
+            this->gaussEliminationSwaps++;
+        }
         for (int i = k + 1; i < n; ++i) {
             double c = matrix->getAt(i, k) / matrix->getAt(k, k);
             matrix->insertAt(i, k, 0);
             for (int j = k + 1; j < n; ++j) {
-                matrix->subtractAt(i, j, c * matrix->getAt(k, j));
-                // Verifica se foi feito o swap. Se sim o valor atribuído deve ser multiplicado por -1
-                if (k != imax) {
-                    matrix->insertAt(i, j, matrix->getAt(i, j) * -1);
-                }
+                matrix->subtractAt(i, j, (c * matrix->getAt(k, j)));
             }
         }
     }
-    return false;
+    return this->gaussEliminationSwaps;
 }
 
 Matrix* Matrix::topTriangulationWithGaussianElimination() {
     Matrix* topTriangulation = this->copy();
     this->gaussElimination(topTriangulation);
     return topTriangulation;
+}
+
+Matrix* Matrix::cofactorMatrix() {
+    Matrix* cofactorMatrix = new Matrix(this->getI(), this->getJ());
+    for (int i = 0; i < this->getI(); i++) {
+        for (int j = 0; j < this->getJ(); j++) {
+            cofactorMatrix->insertAt(i, j, (pow(-1, (i + j)) * this->determinant(this->getSubMatrix(i, j))));
+        }
+    }
+    return cofactorMatrix;
+}
+
+Matrix* Matrix::adjointMatrix() {
+    return this->cofactorMatrix()->transpose();
+}
+
+Matrix* Matrix::inverse() {
+    try {
+        double determinant = this->determinant();
+        if (determinant != 0) {
+            return ((*this->adjointMatrix()) * double(1 / determinant));
+            return this->adjointMatrix()->multiply(1 / determinant);
+        }
+        throw MatrixException("Matriz não inversível");
+    } catch (MatrixException e) {
+        std::cout << e.what() << std::endl;
+    }
 }
 
 /**
@@ -449,8 +506,8 @@ int Matrix::getJ() {
 /**
  * {inherited}
  */
-Matrix* Matrix::operator* (Matrix* matrix) {
-    return this->multiply(matrix);
+Matrix* Matrix::operator* (Matrix matrix) {
+    return this->multiply(&matrix);
 }
 
 /**
@@ -463,13 +520,20 @@ Matrix* Matrix::operator* (double number) {
 /**
  * {inherited}
  */
-Matrix* Matrix::operator+ (Matrix* matrix) {
-    return this->sum(matrix);
+Matrix* Matrix::operator+ (Matrix matrix) {
+    return this->sum(&matrix);
 }
 
 /**
  * {inherited}
  */
-Matrix* Matrix::operator-(Matrix* matrix) {
-    return this->subtract(matrix);
+Matrix* Matrix::operator-(Matrix matrix) {
+    return this->subtract(&matrix);
+}
+
+/**
+ * {inherited}
+ */
+void Matrix::operator<< (matrix_double matrix) {
+    this->matrix = matrix;
 }
